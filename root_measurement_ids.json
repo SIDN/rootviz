@@ -1,0 +1,67 @@
+{
+    "A": {
+        "ipv4": 10309,
+        "ipv6": 11309,
+        "chaos_string": "nnn1-pao2,nnn1-usnyc-2c,nnn1-nlams-4"
+    },
+    "B": {
+        "ipv4": 10310,
+        "ipv6": 11310,
+        "chaos_string": "b4-fra,b1-fra"
+    },
+    "C": {
+        "ipv4": 10311,
+        "ipv6": 11311,
+        "chaos_string": "fra1b.c.root-servers.org,bts1a.c.root-servers.org"
+    },
+    "D": {
+        "ipv4": 10312,
+        "ipv6": 11312,
+        "chaos_string": "ffde5.droot.maxgigapop.net,fde4.droot.maxgigapop.net"
+    },
+    "E": {
+        "ipv4": 10313,
+        "ipv6": 11313,
+        "chaos_string": "c01.AMS.eroot,p04.ber.eroot"
+    },
+    "F": {
+        "ipv4": 10304,
+        "ipv6": 11304,
+        "chaos_string": "CDG.cf.f.root-servers.org"
+    },
+    "G": {
+        "ipv4": 10314,
+        "ipv6": 11314,
+        "chaos_string": "groot-eur1-3,groot-pac2-1"
+    },
+    "H": {
+        "ipv4": 10315,
+        "ipv6": 11315,
+        "chaos_string": "001.fra.h.root-servers.org,001.den.h.root-servers.org"
+    },
+    "I": {
+        "ipv4": 10305,
+        "ipv6": 11305,
+        "chaos_string": "s1.poa, s1.cdg"
+    },
+    "J": {
+        "ipv4": 10316,
+        "ipv6": 11316,
+        "chaos_string": "rootns-lon8,rootns-ams5"
+    },
+    "K": {
+        "ipv4": 10301,
+        "ipv6": 11301,
+        "chaos_string": "ns2.nl-ams.k.ripe.net,ns1.ro-buh.k.ripe.net"
+    },
+    "L": {
+        "ipv4": 10308,
+        "ipv6": 11308,
+        "chaos_string": "cz-xuy-aa,ru-mow-ac,us-cgh-ab"
+    },
+    "M": {
+        "ipv4": 10306,
+        "ipv6": 11306,
+        "chaos_string": "M-ORY-3,M-SJC-3"
+    }
+}
