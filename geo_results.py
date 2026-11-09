@@ -99,7 +99,7 @@ def enrich(df: pd.DataFrame, probes: pd.DataFrame, ipv: str, validator: Callable
 
     # validate each distinct answer once
     verdicts = {v: validate_chaos_string(validator, v) for v in df["rdata"].dropna().unique()}
-    df["chaos_valid"] = df["rdata"].map(verdicts).fillna(False).astype(bool)
+    df["chaos_valid"] = df["rdata"].map(verdicts).eq(True)  # unmapped (no answer) -> False
     return df.drop(columns=["asn_v4", "asn_v6", "country_code"])
 
 
