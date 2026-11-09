@@ -1,0 +1,14 @@
+save_dir: "./results"
+agg_output_dir: "${save_dir}/agg"
+grafana_input_dir: "${agg_output_dir}"
+batch_secs: 1800
+max_catchup_windows: 4
+measurements:
+  A:
+    ipv4: 10309
+    ipv6: 11309
+    regex: "^nnn1-"
+  exact.example:
+    ipv4: 1
+    ipv6: 2
+    chaos_string: "ns1-ams, ns1-fra"

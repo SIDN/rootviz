@@ -1,0 +1,135 @@
+# ============================================================================
+# rootviz configuration
+# ============================================================================
+# Relative paths are resolved from the directory containing this file when the
+# pipeline is started with run_all_scripts.py (individual scripts use the
+# current working directory).
+#
+# ${name} references another top-level value, e.g. "${save_dir}/agg".
+#
+# Secrets do NOT go in this file. Set GRAFANA_API_KEY in the environment.
+# ============================================================================
+
+# --- run_all_scripts.py -----------------------------------------------------
+# base_path: "/opt/rootviz"     # where the scripts live (default: next to run_all_scripts.py)
+scripts:
+  - get_atlas_data.py           # download CHAOS TXT results from RIPE Atlas
+  - probes_metadata.py          # download probe metadata (ASN, country, tags)
+  - geo_results.py              # enrich results + validate CHAOS answers
+  - aggregator.py               # per-window JSON summaries
+  - post-json-to-grafana.py     # push metrics to an OTLP endpoint
+lock_file: ".rootviz.lock"      # prevents overlapping cron runs
+logging_level: "INFO"           # DEBUG, INFO, WARNING, ERROR
+
+# --- Directories ------------------------------------------------------------
+save_dir: "./results"                     # raw + enriched TSV files
+probes_dir: "probes"                      # probes-YYYYMMDD.csv files
+agg_input_dir: "${save_dir}"              # aggregator input
+agg_output_dir: "${save_dir}/agg"         # aggregator output (JSON)
+grafana_input_dir: "${agg_output_dir}"    # exporter input
+
+# --- get_atlas_data.py --------------------------------------------------------
+state_file: "chaos_state.json"            # last fetched window per measurement
+log_file: "chaos_halfhourly_info_error.log"
+api_base: "https://atlas.ripe.net/api/v2/measurements"
+batch_secs: 1800                          # window size (30 minutes)
+max_workers: 4                            # parallel downloads
+max_catchup_windows: 48                   # how far back to backfill missed windows
+retry_delays: [60, 180, 540, 900]         # seconds to wait between retries
+request_timeout: 90                       # seconds
+
+# --- Measurements -------------------------------------------------------------
+# One entry per DNS service. ipv4/ipv6 are RIPE Atlas measurement IDs that send
+# "hostname.bind CHAOS TXT" (or id.server) queries to the service.
+#
+#   regex         Python regex; an answer is valid if re.match(regex, answer)
+#                 succeeds (anchored at the start, add $ to anchor the end).
+#   chaos_string  Comma-separated example/allowed answers. Used as an exact-match
+#                 allow-list only when no regex is set.
+#
+# The service name appears in file names and metric names: use letters, digits,
+# dots and dashes only.
+#
+# The entries below are the built-in RIPE Atlas measurements to the 13 root
+# server letters.
+measurements:
+  A:
+    ipv4: 10309
+    ipv6: 11309
+    chaos_string: "nnn1-pao2,nnn1-usnyc-2c,nnn1-nlams-4"
+    regex: "^nnn1-"
+  B:
+    ipv4: 10310
+    ipv6: 11310
+    chaos_string: "b4-fra,b1-fra"
+    regex: "^b[1-4]-"
+  C:
+    ipv4: 10311
+    ipv6: 11311
+    chaos_string: "fra1b.c.root-servers.org,bts1a.c.root-servers.org"
+    regex: "^.*\\.c\\.root-servers\\.org$"
+  D:
+    ipv4: 10312
+    ipv6: 11312
+    chaos_string: "ffde5.droot.maxgigapop.net,fde4.droot.maxgigapop.net"
+    regex: "^.*\\.droot\\.maxgigapop\\.net$"
+  E:
+    ipv4: 10313
+    ipv6: 11313
+    chaos_string: "c01.AMS.eroot,p04.ber.eroot"
+    regex: "^.*\\.eroot$"
+  F:
+    ipv4: 10304
+    ipv6: 11304
+    chaos_string: "CDG.cf.f.root-servers.org"
+    regex: "^.*\\.f\\.root-servers\\.org$"
+  G:
+    ipv4: 10314
+    ipv6: 11314
+    chaos_string: "groot-eur1-3,groot-pac2-1"
+    regex: "^groot-"
+  H:
+    ipv4: 10315
+    ipv6: 11315
+    chaos_string: "001.fra.h.root-servers.org,001.den.h.root-servers.org"
+    regex: "^.*\\.h\\.root-servers\\.org$"
+  I:
+    ipv4: 10305
+    ipv6: 11305
+    chaos_string: "s1.poa,s1.cdg"
+    regex: "^s[0-9]\\."
+  J:
+    ipv4: 10316
+    ipv6: 11316
+    chaos_string: "rootns-lon8,rootns-ams5"
+    regex: "^rootns-"
+  K:
+    ipv4: 10301
+    ipv6: 11301
+    chaos_string: "ns2.nl-ams.k.ripe.net,ns1.ro-buh.k.ripe.net"
+    regex: "^.*\\.k\\.ripe\\.net$"
+  L:
+    ipv4: 10308
+    ipv6: 11308
+    chaos_string: "cz-xuy-aa,ru-mow-ac,us-cgh-ab"
+    regex: "^[a-z]{2}-[a-z]+-[a-z]{2}$"
+  M:
+    ipv4: 10306
+    ipv6: 11306
+    chaos_string: "M-ORY-3,M-SJC-3"
+    regex: "^M-"
+
+# --- probes_metadata.py -------------------------------------------------------
+days_to_keep: 5
+
+# --- aggregator.py ------------------------------------------------------------
+agg_delete_input: true            # delete the enriched TSV after aggregating
+agg_local_rtt_ms: 5               # failed answers faster than this => "maybe hijack"
+
+# --- post-json-to-grafana.py ----------------------------------------------------
+# Any OTLP/HTTP metrics endpoint. Leave unset to skip exporting.
+# grafana_url: "https://otlp-gateway-prod-eu-west-2.grafana.net/otlp/v1/metrics"
+grafana_metric_prefix: "rootviz"
+grafana_delay_between_posts: 0            # seconds
+grafana_timeout: 30                       # seconds
+grafana_incomplete_max_age_hours: 6       # send a window with only v4 or v6 after this long
