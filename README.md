@@ -238,6 +238,14 @@ per protocol (attribute `protocol` = `v4` or `v6`).
 | `median_rtt_rcode0_correct_chaos`, `p75_…`, `p99_…` | RTT percentiles (ms) |
 | `failed_asns_valid_probes` | `asn_failed_probes_classification_len` |
 
+## API access
+
+In addition to the public dashboard, SIDN Labs offers a hosted API to query
+the underlying metrics directly (authenticated, rate-limited). See
+**[API.md](API.md)** for the endpoint, authentication and request/response
+details. The API service itself is closed-source; this repository is only
+the data pipeline that feeds it.
+
 ## Testing
 
 ```bash
