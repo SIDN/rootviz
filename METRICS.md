@@ -178,6 +178,8 @@ the window **start**.
 | `p99_rtt_rcode0_correct_chaos` | `rtt_rcode0_correct_chaos.p99` | ms | double |
 | `failed_asns_valid_probes` | `asn_failed_probes_classification_len` | count | int |
 
+**API names.** The public [API](API.md) exposes the same gauges as `<LETTER>_<suffix>` (for example `B_timeout_probes`): the `<grafana_metric_prefix>` is dropped and the service is the upper-case instance letter. The suffixes in the table are identical.
+
 If a value is missing, for example no RTT because there were no valid answers,
 that data point is left out rather than sent as 0. `p25`, the per-country and
 per-continent RTTs, `rcode_counts`, `error_counts`, `failed_probes_invalid` and
