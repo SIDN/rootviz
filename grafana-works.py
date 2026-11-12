@@ -26,7 +26,6 @@ def main() -> int:
     now_ns = str(time.time_ns())
     payload = {"resourceMetrics": [{"scopeMetrics": [{"metrics": [{
         "name": "rootviz_smoke_test",
-        "unit": "1",
         "description": "rootviz connectivity test",
         "gauge": {"dataPoints": [
             {"asInt": 123, "timeUnixNano": now_ns,

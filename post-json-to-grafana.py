@@ -44,29 +44,31 @@ PROTOCOLS = {"IPv4": "v4", "IPv6": "v6"}
 
 logger = logging.getLogger(__name__)
 
-# (metric suffix, description, unit, value type, extractor)
+# (metric suffix, description, value type, extractor)
+# No OTLP "unit" is sent on purpose: Prometheus appends it to the metric name
+# (e.g. "_ratio", "_milliseconds"), which would break existing dashboards.
 METRICS = [
-    ("timeout_probes", "Number of Atlas Probes that timed out but are valid by IP version", "1", "asInt",
+    ("timeout_probes", "Number of Atlas Probes that timed out but are valid by IP version", "asInt",
      lambda d: d.get("failed_probes_timeout_but_stack_works")),
-    ("total_queries", "Total number of queries by IP version", "1", "asInt",
+    ("total_queries", "Total number of queries by IP version", "asInt",
      lambda d: d.get("total_queries")),
-    ("total_probes", "Total number of Atlas Probes by IP version", "1", "asInt",
+    ("total_probes", "Total number of Atlas Probes by IP version", "asInt",
      lambda d: d.get("total_probes")),
-    ("valid_rcode0_queries_with_correct_chaos", "Number of valid queries (rcode 0 and correct chaos) by IP version", "1", "asInt",
+    ("valid_rcode0_queries_with_correct_chaos", "Number of valid queries (rcode 0 and correct chaos) by IP version", "asInt",
      lambda d: d.get("valid_queries_rcode0_with_correct_chaos")),
-    ("valid_probes_with_errors_timeout_etc", "Number of Atlas Probes with Errors (timeout, socket, senderror) by IP version", "1", "asInt",
+    ("valid_probes_with_errors_timeout_etc", "Number of Atlas Probes with Errors (timeout, socket, senderror) by IP version", "asInt",
      lambda d: d.get("failed_probes_error")),
-    ("valid_probes_failed_no_error", "Number of Atlas Probes that failed with no error by IP version", "1", "asInt",
+    ("valid_probes_failed_no_error", "Number of Atlas Probes that failed with no error by IP version", "asInt",
      lambda d: d.get("failed_probes_valid")),
-    ("other_rcode_queries", "Number of queries without rcode 0 (including no response) by IP version", "1", "asInt",
+    ("other_rcode_queries", "Number of queries without rcode 0 (including no response) by IP version", "asInt",
      lambda d: other_rcode_count(d.get("rcode_counts") or {})),
-    ("median_rtt_rcode0_correct_chaos", "Median RTT (ms) for valid queries (rcode 0 and correct chaos) by IP version", "ms", "asDouble",
+    ("median_rtt_rcode0_correct_chaos", "Median RTT (ms) for valid queries (rcode 0 and correct chaos) by IP version", "asDouble",
      lambda d: (d.get("rtt_rcode0_correct_chaos") or {}).get("p50")),
-    ("p99_rtt_rcode0_correct_chaos", "99th percentile RTT (ms) for valid queries (rcode 0 and correct chaos) by IP version", "ms", "asDouble",
+    ("p99_rtt_rcode0_correct_chaos", "99th percentile RTT (ms) for valid queries (rcode 0 and correct chaos) by IP version", "asDouble",
      lambda d: (d.get("rtt_rcode0_correct_chaos") or {}).get("p99")),
-    ("p75_rtt_rcode0_correct_chaos", "75th percentile RTT (ms) for valid queries (rcode 0 and correct chaos) by IP version", "ms", "asDouble",
+    ("p75_rtt_rcode0_correct_chaos", "75th percentile RTT (ms) for valid queries (rcode 0 and correct chaos) by IP version", "asDouble",
      lambda d: (d.get("rtt_rcode0_correct_chaos") or {}).get("p75")),
-    ("failed_asns_valid_probes", "Number of ASNs whose timing-out probes have no other working probe, by IP version", "1", "asInt",
+    ("failed_asns_valid_probes", "Number of ASNs whose timing-out probes have no other working probe, by IP version", "asInt",
      lambda d: d.get("asn_failed_probes_classification_len")),
 ]
 
@@ -98,7 +100,7 @@ def find_groups(input_dir: str = INPUT_DIR) -> Dict[str, Dict[str, Dict[str, str
 def build_payload(service: str, data: Dict[str, dict], time_unix_nano: int) -> dict:
     """One OTLP ExportMetricsServiceRequest with all metrics for one service/window."""
     metrics = []
-    for suffix, description, unit, value_type, extract in METRICS:
+    for suffix, description, value_type, extract in METRICS:
         points = []
         for ipv, summary in data.items():
             value = extract(summary)
@@ -112,7 +114,6 @@ def build_payload(service: str, data: Dict[str, dict], time_unix_nano: int) -> d
         if points:
             metrics.append({
                 "name": f"{METRIC_PREFIX}_{service}_{suffix}",
-                "unit": unit,
                 "description": description,
                 "gauge": {"dataPoints": points},
             })
