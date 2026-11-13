@@ -153,13 +153,22 @@ def window_age_secs(ts: str) -> Optional[float]:
 
 
 def process_groups(groups, session: requests.Session) -> int:
+    """Send windows oldest first. Prometheus rejects samples older than the
+    newest one it already has for a series, so once a service has a window that
+    cannot be sent yet (waiting or failed), its newer windows are held back
+    until a later run."""
     failures = 0
-    for ts in sorted(groups):
+    blocked = set()  # services with an unsent older window
+    for ts in sorted(groups):  # "YYYYMMDD_HHMM_HHMM" sorts chronologically
         for service, files in sorted(groups[ts].items()):
+            if service in blocked:
+                logger.info(f"[{service} {ts}] held back until older window is sent")
+                continue
             if len(files) < len(PROTOCOLS):
                 age = window_age_secs(ts)
                 if age is None or age < INCOMPLETE_MAX_AGE_SECS:
                     logger.info(f"[{service} {ts}] waiting for missing protocol file")
+                    blocked.add(service)
                     continue
                 logger.warning(f"[{service} {ts}] sending incomplete window (only {sorted(files)})")
 
@@ -180,6 +189,7 @@ def process_groups(groups, session: requests.Session) -> int:
                     gzip_and_move(path)
             else:
                 failures += 1
+                blocked.add(service)
     return failures
 
 
