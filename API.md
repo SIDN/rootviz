@@ -57,6 +57,10 @@ FastAPI's interactive documentation is served on the same HTTPS host and port:
 
 Include the API key issued to you in the `X-API-Key` request header. Keep it secret and do not commit it to source control. To request an API key, contact `sidnlabs@sidn.nl`.
 
+## Terms of use
+
+The API is provided free of charge, on a best-effort basis, "as is" and without warranty of any kind. SIDN does not guarantee availability, accuracy or completeness of the data, and there is no service level agreement. We may change, rate-limit or withdraw the API, and revoke API keys, at any time. SIDN is not liable for any damage resulting from the use of the API or the data. Data obtained through the API is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/): cite SIDN Labs and RootViz, and credit RIPE NCC and the RIPE Atlas probe hosts.
+
 ## Endpoint
 
 ### `GET /metrics`
