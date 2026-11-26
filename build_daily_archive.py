@@ -90,6 +90,7 @@ def atomic_write(dst: str, write_fn) -> None:
     os.close(fd)
     try:
         write_fn(tmp)
+        os.chmod(tmp, 0o644)  # mkstemp creates 0600; published files must be world-readable
         os.replace(tmp, dst)
     except BaseException:
         if os.path.exists(tmp):
