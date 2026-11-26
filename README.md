@@ -4,6 +4,10 @@
 > **See it live at [rootviz.sidnlabs.nl](https://rootviz.sidnlabs.nl)**: real-time health of all 13 DNS root servers, as seen by RIPE Atlas probes worldwide.
 > This repository contains the backend that powers it.
 
+> [!IMPORTANT]
+> **Download the datasets at [downloads.sidnlabs.nl/rootviz-data](https://downloads.sidnlabs.nl/rootviz-data)**: daily archives of the measurements, per root server letter, updated every day.
+> Licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+
 [![rootviz dashboard: percentage of RIPE Atlas probes timing out per root server over the last 7 days](docs/rootviz.png)](https://rootviz.sidnlabs.nl)
 
 Monitor the reachability, latency and integrity of anycast DNS services (such as
